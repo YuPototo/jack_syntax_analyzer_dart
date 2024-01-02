@@ -1,5 +1,17 @@
-import 'package:jack_syntax_analyzer_dart/jack_syntax_analyzer_dart.dart' as jack_syntax_analyzer_dart;
+import 'dart:io';
+import 'package:args/args.dart';
+import 'package:jack_syntax_analyzer_dart/check_path.dart';
 
 void main(List<String> arguments) {
-  print('Hello world: ${jack_syntax_analyzer_dart.calculate()}!');
+  exitCode = 0; // Presume success
+  final parser = ArgParser();
+
+  ArgResults argResults = parser.parse(arguments);
+  final path = argResults.rest[0];
+
+  var validFiles = checkPath(path);
+
+  for (var file in validFiles) {
+    print(file.path);
+  }
 }
