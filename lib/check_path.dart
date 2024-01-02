@@ -2,16 +2,15 @@ import 'dart:io';
 
 List<FileSystemEntity> checkPath(String path) {
   // check if path is a directory or a file
-
   var isDir = FileSystemEntity.isDirectorySync(path);
 
   if (isDir) {
     var dir = Directory(path);
-    handleDirectorySource(dir);
-    return dir.listSync();
+    return handleDirectorySource(dir);
   } else {
-    // todo: handle file source
-    throw Exception('File source not implemented yet');
+    var file = File(path);
+    handleFileSource(file);
+    return [file];
   }
 }
 
@@ -48,4 +47,22 @@ void checkFileName(String path) {
   if (firstChar.toUpperCase() != firstChar) {
     throw Exception('Invalid file name');
   }
+}
+
+void handleFileSource(File file) {
+  // check if file exists
+
+  if (!file.existsSync()) {
+    throw Exception('File does not exist');
+  }
+
+  // check if file is a jack file
+
+  if (!file.path.endsWith('.jack')) {
+    throw Exception('File is not a jack file');
+  }
+
+  // validate file name
+
+  checkFileName(file.path);
 }
