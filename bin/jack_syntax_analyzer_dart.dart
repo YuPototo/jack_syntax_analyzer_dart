@@ -12,6 +12,7 @@ void main(List<String> arguments) {
   var validFiles = checkPath(path);
 
   for (var file in validFiles) {
-    print(file.path);
+    // print file content
+    print(file.readAsStringSync());
   }
 }

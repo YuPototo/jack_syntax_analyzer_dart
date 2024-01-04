@@ -1,6 +1,6 @@
 import 'dart:io';
 
-List<FileSystemEntity> checkPath(String path) {
+List<File> checkPath(String path) {
   // check if path is a directory or a file
   var isDir = FileSystemEntity.isDirectorySync(path);
 
@@ -14,10 +14,10 @@ List<FileSystemEntity> checkPath(String path) {
   }
 }
 
-List<FileSystemEntity> handleDirectorySource(Directory dir) {
+List<File> handleDirectorySource(Directory dir) {
   // list all files in directory
 
-  var files = dir.listSync();
+  var files = dir.listSync().whereType<File>().toList();
 
   // filter files that are jack files
   var jackFiles = files.where((file) => file.path.endsWith('.jack')).toList();
