@@ -40,12 +40,55 @@ class JackTokenizer {
   }
 
   static List<String> tokenize(List<String> cleanLines) {
-    // ! this implementation is not correct
     List<String> tokens = [];
     for (var line in cleanLines) {
-      var lineTokens = line.split(' ');
-      for (var token in lineTokens) {
-        tokens.add(token);
+      var newTokens = tokenizeLine(line);
+      tokens.addAll(newTokens);
+    }
+    return tokens;
+  }
+
+  static List<String> handleTokenWithSign(String possibleTokens) {
+    List<String> tokens = [];
+    if (possibleTokens.endsWith(';')) {
+      var firstPart = possibleTokens.substring(0, possibleTokens.length - 1);
+      if (firstPart != '') {
+        tokens.addAll(handleTokenWithSign(firstPart));
+      }
+      tokens.add(';');
+    } else if (possibleTokens.startsWith('(')) {
+      tokens.add('(');
+      var afterParenthesis = possibleTokens.substring(1);
+      if (afterParenthesis != '') {
+        tokens.add(afterParenthesis);
+      }
+    } else if (possibleTokens.endsWith(')')) {
+      var beforeParenthesis =
+          possibleTokens.substring(0, possibleTokens.length - 1);
+      if (beforeParenthesis != '') {
+        tokens.add(beforeParenthesis);
+      }
+      tokens.add(')');
+    } else if (possibleTokens.endsWith(',')) {
+      var beforeComma = possibleTokens.substring(0, possibleTokens.length - 1);
+      if (beforeComma != '') {
+        tokens.add(beforeComma);
+      }
+      tokens.add(',');
+    } else {
+      tokens.add(possibleTokens);
+    }
+    return tokens;
+  }
+
+  static List<String> tokenizeLine(String cleanLine) {
+    List<String> tokens = [];
+
+    for (var word in cleanLine.split(' ')) {
+      if (word.contains(RegExp(r'[;(),]'))) {
+        tokens.addAll(handleTokenWithSign(word));
+      } else {
+        tokens.add(word);
       }
     }
     return tokens;

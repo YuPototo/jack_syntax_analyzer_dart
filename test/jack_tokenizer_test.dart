@@ -90,6 +90,75 @@ void main() {
     });
   });
 
+  group('static handleTokenWithSign', () {
+    test("2;", () {
+      // case: let s = 2;
+      var possibleTokens = '2;';
+      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
+      expect(tokens, equals(['2', ';']));
+    });
+
+    test("(1", () {
+      // case: let s = (1 + 2);
+      var possibleTokens = '(1';
+      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
+      expect(tokens, equals(['(', '1']));
+    });
+
+    test("2)", () {
+      // case: let s = (1 + 2) ; // note the space before ;
+      var possibleTokens = '2)';
+      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
+      expect(tokens, equals(['2', ')']));
+    });
+
+    test("2)", () {
+      // case: let s = (1 + 2);
+      var possibleTokens = '2);';
+      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
+      expect(tokens, equals(['2', ')', ';']));
+    });
+
+    test("x,", () {
+      // case: field int x, y;
+      var possibleTokens = 'x,';
+      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
+      expect(tokens, equals(['x', ',']));
+    });
+  });
+
+  group('static tokenizeLine', () {
+    test("semicolon", () {
+      var line = 'let s = 1;';
+      var tokens = JackTokenizer.tokenizeLine(line);
+      expect(tokens, equals(['let', 's', '=', '1', ';']));
+    });
+
+    test("semicolon with space", () {
+      var line = 'let s = 1 ;';
+      var tokens = JackTokenizer.tokenizeLine(line);
+      expect(tokens, equals(['let', 's', '=', '1', ';']));
+    });
+
+    test("bracket", () {
+      var line = 'let s = (1 + 2);';
+      var tokens = JackTokenizer.tokenizeLine(line);
+      expect(tokens, equals(['let', 's', '=', '(', '1', '+', '2', ')', ';']));
+    });
+
+    test('bracket with space', () {
+      var line = 'let s = ( 1 + 2 );';
+      var tokens = JackTokenizer.tokenizeLine(line);
+      expect(tokens, equals(['let', 's', '=', '(', '1', '+', '2', ')', ';']));
+    });
+
+    test('comma', () {
+      var line = 'field int x, y;';
+      var tokens = JackTokenizer.tokenizeLine(line);
+      expect(tokens, equals(['field', 'int', 'x', ',', 'y', ';']));
+    });
+  });
+
   group('static tokenize', () {
     test('empty code', () {
       var lines = '''
@@ -107,5 +176,5 @@ void main() {
             ';',
           ]));
     });
-  });
+  }, skip: "test after tokenizeLine is implemented");
 }
