@@ -3,178 +3,77 @@ import 'package:test/test.dart';
 import 'package:jack_syntax_analyzer_dart/jack_tokenizer.dart';
 
 void main() {
-  group('static removeComments()', () {
-    test("remove nothing", () {
-      var lines = [''];
-      expect(JackTokenizer.removeComments(lines), equals(['']));
+  group('hasMoreTokens', () {
+    test("A simple true", () {
+      var scriptContent = 'let x = 5;';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(true));
     });
 
-    test("remove // ", () {
-      var lines = ['// comment'];
-      expect(JackTokenizer.removeComments(lines), equals(['']));
+    test("A simple false", () {
+      var scriptContent = '';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(false));
     });
 
-    test("remove // with code", () {
-      var lines = ['let s = 1 // comment'];
-      expect(JackTokenizer.removeComments(lines), equals(['let s = 1 ']));
+    test('Ignore whitespace', () {
+      var scriptContent = '  ';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(false));
     });
 
-    test("remove /** comment */", () {
-      var lines = ['/** comment */'];
-      expect(JackTokenizer.removeComments(lines), equals(['']));
+    test('Ignore newlines', () {
+      var scriptContent = '\n';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(false));
     });
 
-    test("remove /** comment */ with code", () {
-      var lines = ['let s = /** comment */ 1'];
-      expect(JackTokenizer.removeComments(lines), equals(['let s =  1']));
+    test('Ignore whitespace and newlines', () {
+      var scriptContent = '  \n';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(false));
     });
 
-    test("remove /* comment */", () {
-      var lines = ['/* comment */'];
-      expect(JackTokenizer.removeComments(lines), equals(['']));
+    test('Token after new line and whitespace', () {
+      var scriptContent = '  \n let x = 5;';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(true));
     });
 
-    test("remove /* comment */ with code", () {
-      var lines = ['let s = /* comment */ 1'];
-      expect(JackTokenizer.removeComments(lines), equals(['let s =  1']));
+    test('ignore // comment', () {
+      var scriptContent = '// comment \n';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(false));
     });
 
-    test("should not remove // in double quote", () {
-      var lines = ['let s = "// comment"'];
-      expect(JackTokenizer.removeComments(lines),
-          equals(['let s = "// comment"']));
+    test('code after // comment', () {
+      var scriptContent = '// comment\nlet x = 5;';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(true));
     });
 
-    test("should not remove /** */ inside double quote", () {
-      var lines = ['let s = "/** comment */"'];
-      expect(JackTokenizer.removeComments(lines),
-          equals(['let s = "/** comment */"']));
+    test('ignore /* comment */', () {
+      var scriptContent = '/* comment */';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(false));
     });
 
-    test("should not remove /* */ inside double quote", () {
-      var lines = ['let s = "/* comment */"'];
-      expect(JackTokenizer.removeComments(lines),
-          equals(['let s = "/* comment */"']));
-    });
-  });
-
-  group('static cleanCode', () {
-    test('code with empty lines', () {
-      var scriptContent = '''
-
-        let s = 1;
-
-        let t = 2;
-        ''';
-      var cleanScript = JackTokenizer.cleanCode(scriptContent);
-      expect(cleanScript, equals(['let s = 1;', 'let t = 2;']));
+    test('code after /* comment */', () {
+      var scriptContent = '/* comment */let x = 5;';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(true));
     });
 
-    test('code with comments', () {
-      var scriptContent = '''
-        // comment
-        let s = 1; // comment
-        let t = 2; /* comment */
-        ''';
-      var cleanScript = JackTokenizer.cleanCode(scriptContent);
-      expect(cleanScript, equals(['let s = 1;', 'let t = 2;']));
+    test('ignore /** comment */', () {
+      var scriptContent = '/** comment */';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(false));
     });
 
-    test('code with trailing spaces', () {
-      var scriptContent = '''
-        let s = 1;  
-        let t = 2; 
-        ''';
-      var cleanScript = JackTokenizer.cleanCode(scriptContent);
-      expect(cleanScript, equals(['let s = 1;', 'let t = 2;']));
+    test('code after /** comment */', () {
+      var scriptContent = '/** comment */let x = 5;';
+      var tokenizer = JackTokenizer(scriptContent);
+      expect(tokenizer.hasMoreTokens(), equals(true));
     });
   });
-
-  group('static handleTokenWithSign', () {
-    test("2;", () {
-      // case: let s = 2;
-      var possibleTokens = '2;';
-      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
-      expect(tokens, equals(['2', ';']));
-    });
-
-    test("(1", () {
-      // case: let s = (1 + 2);
-      var possibleTokens = '(1';
-      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
-      expect(tokens, equals(['(', '1']));
-    });
-
-    test("2)", () {
-      // case: let s = (1 + 2) ; // note the space before ;
-      var possibleTokens = '2)';
-      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
-      expect(tokens, equals(['2', ')']));
-    });
-
-    test("2)", () {
-      // case: let s = (1 + 2);
-      var possibleTokens = '2);';
-      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
-      expect(tokens, equals(['2', ')', ';']));
-    });
-
-    test("x,", () {
-      // case: field int x, y;
-      var possibleTokens = 'x,';
-      var tokens = JackTokenizer.handleTokenWithSign(possibleTokens);
-      expect(tokens, equals(['x', ',']));
-    });
-  });
-
-  group('static tokenizeLine', () {
-    test("semicolon", () {
-      var line = 'let s = 1;';
-      var tokens = JackTokenizer.tokenizeLine(line);
-      expect(tokens, equals(['let', 's', '=', '1', ';']));
-    });
-
-    test("semicolon with space", () {
-      var line = 'let s = 1 ;';
-      var tokens = JackTokenizer.tokenizeLine(line);
-      expect(tokens, equals(['let', 's', '=', '1', ';']));
-    });
-
-    test("bracket", () {
-      var line = 'let s = (1 + 2);';
-      var tokens = JackTokenizer.tokenizeLine(line);
-      expect(tokens, equals(['let', 's', '=', '(', '1', '+', '2', ')', ';']));
-    });
-
-    test('bracket with space', () {
-      var line = 'let s = ( 1 + 2 );';
-      var tokens = JackTokenizer.tokenizeLine(line);
-      expect(tokens, equals(['let', 's', '=', '(', '1', '+', '2', ')', ';']));
-    });
-
-    test('comma', () {
-      var line = 'field int x, y;';
-      var tokens = JackTokenizer.tokenizeLine(line);
-      expect(tokens, equals(['field', 'int', 'x', ',', 'y', ';']));
-    });
-  });
-
-  group('static tokenize', () {
-    test('empty code', () {
-      var lines = '''
-        let s = 1;
-        ''';
-      var cleanLines = JackTokenizer.cleanCode(lines);
-      var tokens = JackTokenizer.tokenize(cleanLines);
-      expect(
-          tokens,
-          equals([
-            'let',
-            's',
-            '=',
-            '1',
-            ';',
-          ]));
-    });
-  }, skip: "test after tokenizeLine is implemented");
 }
