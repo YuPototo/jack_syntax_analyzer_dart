@@ -97,7 +97,7 @@ Four special symbols are escaped in XML:
 
 ### API
 
-- `constructor`: Takes a file path as input and initializes the tokenizer. After initialization, a list of tokens is available. This is not the best way to do it, because all the heavy lifting is done in the constructor.
+- `constructor`: Takes string as input and initializes the tokenizer.
 - `hasMoreTokens`: Returns true if there are more tokens available.
 - `advance`: Reads the next token from the input and makes it the current token. Should be called only if `hasMoreTokens` is true.
 - `tokenType`: Returns the type of the current token.
