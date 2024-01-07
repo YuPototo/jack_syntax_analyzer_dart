@@ -79,6 +79,11 @@ class JackTokenizer {
       }
     }
   }
+
+  // Should be called only if `hasMoreTokens` is true.
+  void advance() {
+    // todo
+  }
 }
 
 /**
