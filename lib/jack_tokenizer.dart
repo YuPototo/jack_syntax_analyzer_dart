@@ -17,6 +17,7 @@ class JackTokenizer {
       return false;
     }
 
+    // use tmpCursor because we don't want to change the cursor here
     int tmpCursor = cursor;
 
     String possibleToken = "";
@@ -38,39 +39,7 @@ class JackTokenizer {
         if (newChar == " " || newChar == "\n") {
           continue;
         } else if (newChar == '/') {
-          tmpCursor++;
-          String nextChar = scriptContent[tmpCursor];
-          if (nextChar == '/') {
-            while (scriptContent[tmpCursor] != '\n') {
-              tmpCursor++;
-              if (tmpCursor >= scriptContent.length) {
-                return false;
-              }
-            }
-          } else if (nextChar == '*') {
-            // This case would be invalid Jack script:
-            //    An open /* without closing */
-            // It would not happen to this project because
-            // we assume all jack files are valid
-            if (tmpCursor + 2 >= scriptContent.length) {
-              return false;
-            }
-
-            String possibleEndComment =
-                scriptContent[tmpCursor + 1] + scriptContent[tmpCursor + 2];
-
-            while (possibleEndComment != '*/') {
-              tmpCursor++;
-              if (tmpCursor + 2 >= scriptContent.length) {
-                return false;
-              }
-              possibleEndComment =
-                  scriptContent[tmpCursor + 1] + scriptContent[tmpCursor + 2];
-            }
-          } else {
-            // I don't think we will reach here
-            throw Exception("Invalid comment");
-          }
+          tmpCursor = JackTokenizer.handleComment(scriptContent, tmpCursor);
         } else {
           // if it is not a whitespace, newline and comment
           // then it is a valid token, because we assume the script is valid
@@ -82,23 +51,128 @@ class JackTokenizer {
 
   // Should be called only if `hasMoreTokens` is true.
   void advance() {
-    // todo
+    String possibleToken = "";
+    // get next character
+    bool getMoreCharacter = true;
+
+    final RegExp symbolRegex = RegExp(r"[\(\);{}\[\]\.,\+\-\*/&\|<>=~]");
+
+    while (getMoreCharacter) {
+      cursor++;
+
+      if (cursor >= scriptContent.length) {
+        currentToken = possibleToken;
+        getMoreCharacter = false;
+        break;
+      }
+
+      String newChar = scriptContent[cursor];
+
+      // identify the first valid character
+      if (possibleToken.isEmpty) {
+        if (newChar == " " || newChar == "\n") {
+          continue;
+        } else if (newChar == '/') {
+          int endCommentCursor =
+              JackTokenizer.handleComment(scriptContent, cursor);
+          cursor = endCommentCursor;
+        } else if (newChar == '"') {
+          handleStringConstant();
+          getMoreCharacter = false;
+          break;
+        } else {
+          if (symbolRegex.hasMatch(newChar)) {
+            currentToken = newChar;
+            getMoreCharacter = false;
+            break;
+          } else {
+            possibleToken += newChar;
+          }
+        }
+      } else {
+        if (newChar == " " || newChar == "\n") {
+          getMoreCharacter = false;
+          currentToken = possibleToken;
+        } else {
+          if (symbolRegex.hasMatch(newChar)) {
+            cursor--;
+            currentToken = possibleToken;
+            getMoreCharacter = false;
+            break;
+          } else {
+            possibleToken += newChar;
+          }
+        }
+      }
+    }
+  }
+
+  /// return the cursor after the comment
+  /// when calling this function, the cursor should be at the first /
+  static int handleComment(String script, int cursor) {
+    int cursorCopy = cursor;
+
+    var firstChar = script[cursorCopy];
+
+    if (firstChar != '/') {
+      throw Exception("Invalid comment");
+    }
+
+    var firstTwoChar = script[cursorCopy] + script[cursorCopy + 1];
+
+    if (firstTwoChar == '//') {
+      while (script[cursorCopy] != '\n') {
+        cursorCopy++;
+      }
+      return cursorCopy;
+    } else if (firstTwoChar == '/*') {
+      while (script[cursorCopy + 1] + script[cursorCopy + 2] != '*/') {
+        cursorCopy++;
+      }
+      return cursorCopy + 2;
+    } else {
+      throw Exception("Invalid comment");
+    }
+  }
+
+  /// set cursor to the end of string constant
+  /// set currentToken to the string without the double quotes
+  void handleStringConstant() {
+    var firstChar = scriptContent[cursor];
+
+    if (firstChar != '"') {
+      throw Exception("Invalid string constant");
+    }
+
+    cursor++;
+
+    String stringConstant = "";
+
+    while (scriptContent[cursor] != '"') {
+      stringConstant += scriptContent[cursor];
+      cursor++;
+    }
+
+    currentToken = stringConstant;
   }
 }
 
 /**
- * Possible way to get next token:
- *   - get the first valid character
- *   - if it is a comment, then continue to the end of the comment. 
- *   -    try to find a valid token after the comment
- *   - if it is a string, then continue to the end of the string. Return True.
- *   - if it is a normal character, then do following check
- *      - if it is a symbol, then return True
- *      - else continue till the end of the token. Return True.
+ * advance():
+ *   - get the first valid character. There are 4 cases:
+ *      1. whitespace or newline
+ *      2. comment: continue to the end of the comment 
+ *      3. string: continue to the end of the string
+ *      4. non-string token: handle the token 
+ *   - Case 1: whitespace or newline. ignore it and continue to the next character
+ *   - Case 2: comment. continue to the end of the comment. Then start again.
+ *   - Case 3: string. continue to the end of the string. Set currentToken to the string.
+ *   - Case 4: non-string token. Handle it and set currentToken to the token.
  * 
  * hasMoreTokens():
- *    - get the first valid character, it should not be whitespace or newline
+ *    - get the first valid character
+ *    - if it is a whitespace or newline, then continue to the next character
  *    - if it is a comment, then continue to the end of the comment. 
  *       - then start again
- *    - else it is definitely true
+ *    - else it is definitely true, because we assume the script is valid
  */
