@@ -247,14 +247,14 @@ void main() {
         var scriptContent = '"ha"';
         var tokenizer = JackTokenizer(scriptContent);
         tokenizer.advance();
-        expect(tokenizer.currentToken, equals('ha'));
+        expect(tokenizer.currentToken, equals('"ha"'));
       });
 
       test('handle string constant with whitespace', () {
         var scriptContent = '"ha ha"';
         var tokenizer = JackTokenizer(scriptContent);
         tokenizer.advance();
-        expect(tokenizer.currentToken, equals('ha ha'));
+        expect(tokenizer.currentToken, equals('"ha ha"'));
       });
 
       test('A string assignment', () {
@@ -268,7 +268,7 @@ void main() {
         tokenizer.advance();
         expect(tokenizer.currentToken, equals('='));
         tokenizer.advance();
-        expect(tokenizer.currentToken, equals('abc'));
+        expect(tokenizer.currentToken, equals('"abc"'));
         tokenizer.advance();
         expect(tokenizer.currentToken, equals(';'));
       });
@@ -301,8 +301,10 @@ void main() {
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.cursor = 0;
       tokenizer.handleStringConstant();
-      expect(tokenizer.currentToken, equals('ha'));
+      expect(tokenizer.currentToken, equals('"ha"'));
       expect(tokenizer.cursor, equals(3));
     });
   });
+
+  group('tokenType', () {});
 }

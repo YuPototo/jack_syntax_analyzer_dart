@@ -3,6 +3,14 @@ enum CommentType {
   slashStar, // /* comment */ or /** comment */
 }
 
+enum TokenType {
+  keyword,
+  symbol,
+  identifier,
+  intConstant,
+  stringConstant,
+}
+
 class JackTokenizer {
   String scriptContent;
   int cursor; // index of currentToken's last character
@@ -79,6 +87,7 @@ class JackTokenizer {
         } else if (newChar == '"') {
           handleStringConstant();
           getMoreCharacter = false;
+
           break;
         } else {
           if (symbolRegex.hasMatch(newChar)) {
@@ -136,23 +145,23 @@ class JackTokenizer {
   }
 
   /// set cursor to the end of string constant
-  /// set currentToken to the string without the double quotes
+  /// set currentToken to the string with double quotes
   void handleStringConstant() {
     var firstChar = scriptContent[cursor];
 
     if (firstChar != '"') {
       throw Exception("Invalid string constant");
     }
+    String stringConstant = '"';
 
     cursor++;
-
-    String stringConstant = "";
 
     while (scriptContent[cursor] != '"') {
       stringConstant += scriptContent[cursor];
       cursor++;
     }
 
+    stringConstant += '"';
     currentToken = stringConstant;
   }
 }
