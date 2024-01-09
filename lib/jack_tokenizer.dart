@@ -11,6 +11,52 @@ enum TokenType {
   stringConstant,
 }
 
+const symbolList = [
+  '{',
+  '}',
+  '(',
+  ')',
+  '[',
+  ']',
+  '.',
+  ',',
+  ';',
+  '+',
+  '-',
+  '*',
+  '/',
+  '&',
+  '|',
+  '<',
+  '>',
+  '=',
+  '~'
+];
+
+const keywordList = [
+  'class',
+  'constructor',
+  'function',
+  'method',
+  'field',
+  'static',
+  'var',
+  'int',
+  'char',
+  'boolean',
+  'void',
+  'true',
+  'false',
+  'null',
+  'this',
+  'let',
+  'do',
+  'if',
+  'else',
+  'while',
+  'return'
+];
+
 class JackTokenizer {
   String scriptContent;
   int cursor; // index of currentToken's last character
@@ -163,6 +209,74 @@ class JackTokenizer {
 
     stringConstant += '"';
     currentToken = stringConstant;
+  }
+
+  TokenType tokenType() {
+    if (currentToken == null || currentToken!.isEmpty) {
+      throw Exception("currentToken is empty");
+    }
+
+    if (keywordList.contains(currentToken)) {
+      return TokenType.keyword;
+    } else if (symbolList.contains(currentToken)) {
+      return TokenType.symbol;
+    } else if (currentToken!.startsWith('"')) {
+      return TokenType.stringConstant;
+    } else if (currentToken!.startsWith(RegExp(r"[0-9]"))) {
+      return TokenType.intConstant;
+    } else {
+      return TokenType.identifier;
+    }
+  }
+
+  String keyword() {
+    if (tokenType() != TokenType.keyword) {
+      throw Exception("currentToken is not a keyword");
+    }
+
+    return currentToken!.toUpperCase();
+  }
+
+  String symbol() {
+    if (tokenType() != TokenType.symbol) {
+      throw Exception("currentToken is not a symbol");
+    }
+
+    // escape the special characters
+    if (currentToken == '<') {
+      return '&lt;';
+    } else if (currentToken == '>') {
+      return '&gt;';
+    } else if (currentToken == '&') {
+      return '&amp;';
+    } else {
+      return currentToken!;
+    }
+  }
+
+  String identifier() {
+    if (tokenType() != TokenType.identifier) {
+      throw Exception("currentToken is not an identifier");
+    }
+
+    return currentToken!;
+  }
+
+  int intVal() {
+    if (tokenType() != TokenType.intConstant) {
+      throw Exception("currentToken is not an intConstant");
+    }
+
+    return int.parse(currentToken!);
+  }
+
+  String stringVal() {
+    if (tokenType() != TokenType.stringConstant) {
+      throw Exception("currentToken is not a stringConstant");
+    }
+
+    // remove the double quotes
+    return currentToken!.substring(1, currentToken!.length - 1);
   }
 }
 

@@ -295,7 +295,7 @@ void main() {
     });
   });
 
-  group('handleStringConstant', () {
+  group('handleStringConstant()', () {
     test('', () {
       var scriptContent = '"ha"';
       var tokenizer = JackTokenizer(scriptContent);
@@ -306,5 +306,127 @@ void main() {
     });
   });
 
-  group('tokenType', () {});
+  group('tokenType()', () {
+    test('keyword', () {
+      var scriptContent = 'class';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.tokenType(), equals(TokenType.keyword));
+    });
+
+    test('symbol', () {
+      var scriptContent = '{';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.tokenType(), equals(TokenType.symbol));
+    });
+
+    test('stringConstant', () {
+      var scriptContent = '"ha"';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.tokenType(), equals(TokenType.stringConstant));
+    });
+
+    test('identifier', () {
+      var scriptContent = 'x';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.tokenType(), equals(TokenType.identifier));
+    });
+
+    test('intConstant', () {
+      var scriptContent = '5';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.tokenType(), equals(TokenType.intConstant));
+    });
+  });
+
+  group('keyword()', () {
+    test('class', () {
+      var scriptContent = 'class';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.keyword(), equals('CLASS'));
+    });
+
+    test('TRUE', () {
+      var scriptContent = 'true';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.keyword(), equals('TRUE'));
+    });
+  });
+
+  group('symbol()', () {
+    test('{', () {
+      var scriptContent = '{';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.symbol(), equals('{'));
+    });
+
+    test('}', () {
+      var scriptContent = '}';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.symbol(), equals('}'));
+    });
+
+    test('<', () {
+      var scriptContent = '<';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.symbol(), equals('&lt;'));
+    });
+
+    test('>', () {
+      var scriptContent = '>';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.symbol(), equals('&gt;'));
+    });
+
+    test('&', () {
+      var scriptContent = '&';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.symbol(), equals('&amp;'));
+    });
+  });
+
+  group('identifier()', () {
+    test('x', () {
+      var scriptContent = 'x';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.identifier(), equals('x'));
+    });
+
+    test('x_5', () {
+      var scriptContent = 'x_5';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.identifier(), equals('x_5'));
+    });
+  });
+
+  group('intVal()', () {
+    test('5', () {
+      var scriptContent = '5';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.intVal(), equals(5));
+    });
+  });
+
+  group('stringVal()', () {
+    test('"ha"', () {
+      var scriptContent = '"ha"';
+      var tokenizer = JackTokenizer(scriptContent);
+      tokenizer.advance();
+      expect(tokenizer.stringVal(), equals('ha'));
+    });
+  });
 }
