@@ -1,0 +1,17 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "jack_syntax_analyzer_dart",
+            "request": "launch",
+            "type": "dart",
+            "program": "bin/main.dart",
+            "args": [
+                "/Users/qinyu/learn_cs/nand2tetris/jack_syntax_analyzer_dart/integration/Square/Main.jack"
+            ]
+        }
+    ]
+}

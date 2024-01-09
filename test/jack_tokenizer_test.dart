@@ -138,6 +138,17 @@ void main() {
         tokenizer.advance();
         expect(tokenizer.currentToken, equals('='));
       });
+
+      test('/', () {
+        var scriptContent = 'j / 2';
+        var tokenizer = JackTokenizer(scriptContent);
+        tokenizer.advance();
+        expect(tokenizer.currentToken, equals('j'));
+        tokenizer.advance();
+        expect(tokenizer.currentToken, equals('/'));
+        tokenizer.advance();
+        expect(tokenizer.currentToken, equals('2'));
+      });
     });
 
     group('no whitespace case', () {
@@ -348,14 +359,14 @@ void main() {
       var scriptContent = 'class';
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.advance();
-      expect(tokenizer.keyword(), equals('CLASS'));
+      expect(tokenizer.keyword(), equals('class'));
     });
 
     test('TRUE', () {
       var scriptContent = 'true';
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.advance();
-      expect(tokenizer.keyword(), equals('TRUE'));
+      expect(tokenizer.keyword(), equals('true'));
     });
   });
 

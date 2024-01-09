@@ -90,10 +90,18 @@ class JackTokenizer {
       // identify the first valid character
       if (possibleToken.isEmpty) {
         // ignore whitespace and newlines
-        if (newChar == " " || newChar == "\n") {
+        if (newChar.trim().isEmpty) {
           continue;
         } else if (newChar == '/') {
-          tmpCursor = JackTokenizer.handleComment(scriptContent, tmpCursor);
+          // two cases: comment or symbol
+          var nextChar = scriptContent[tmpCursor + 1];
+          if (nextChar == '/' || nextChar == '*') {
+            // comment
+            tmpCursor = JackTokenizer.handleComment(scriptContent, tmpCursor);
+          } else {
+            // symbol
+            return true;
+          }
         } else {
           // if it is not a whitespace, newline and comment
           // then it is a valid token, because we assume the script is valid
@@ -124,12 +132,22 @@ class JackTokenizer {
 
       // identify the first valid character
       if (possibleToken.isEmpty) {
-        if (newChar == " " || newChar == "\n") {
+        if (newChar.trim().isEmpty) {
           continue;
         } else if (newChar == '/') {
-          int endCommentCursor =
-              JackTokenizer.handleComment(scriptContent, cursor);
-          cursor = endCommentCursor;
+          // two cases: comment or symbol
+          var nextChar = scriptContent[cursor + 1];
+          if (nextChar == '/' || nextChar == '*') {
+            // comment
+            int endCommentCursor =
+                JackTokenizer.handleComment(scriptContent, cursor);
+            cursor = endCommentCursor;
+          } else {
+            // symbol
+            currentToken = newChar;
+            getMoreCharacter = false;
+            break;
+          }
         } else if (newChar == '"') {
           handleStringConstant();
           getMoreCharacter = false;
@@ -192,6 +210,7 @@ class JackTokenizer {
 
   /// set cursor to the end of string constant
   /// set currentToken to the string with double quotes
+  /// we assume the script is valid, there would no " and \n in the string constant
   void handleStringConstant() {
     var firstChar = scriptContent[cursor];
 
@@ -234,7 +253,7 @@ class JackTokenizer {
       throw Exception("currentToken is not a keyword");
     }
 
-    return currentToken!.toUpperCase();
+    return currentToken!;
   }
 
   String symbol() {
