@@ -3,14 +3,6 @@ enum CommentType {
   slashStar, // /* comment */ or /** comment */
 }
 
-enum TokenType {
-  keyword,
-  symbol,
-  identifier,
-  intConstant,
-  stringConstant,
-}
-
 const symbolList = [
   '{',
   '}',
@@ -230,26 +222,26 @@ class JackTokenizer {
     currentToken = stringConstant;
   }
 
-  TokenType tokenType() {
+  String tokenType() {
     if (currentToken == null || currentToken!.isEmpty) {
       throw Exception("currentToken is empty");
     }
 
     if (keywordList.contains(currentToken)) {
-      return TokenType.keyword;
+      return 'keyword';
     } else if (symbolList.contains(currentToken)) {
-      return TokenType.symbol;
+      return 'symbol';
     } else if (currentToken!.startsWith('"')) {
-      return TokenType.stringConstant;
+      return 'stringConstant';
     } else if (currentToken!.startsWith(RegExp(r"[0-9]"))) {
-      return TokenType.intConstant;
+      return 'integerConstant';
     } else {
-      return TokenType.identifier;
+      return 'identifier';
     }
   }
 
   String keyword() {
-    if (tokenType() != TokenType.keyword) {
+    if (tokenType() != 'keyword') {
       throw Exception("currentToken is not a keyword");
     }
 
@@ -257,7 +249,7 @@ class JackTokenizer {
   }
 
   String symbol() {
-    if (tokenType() != TokenType.symbol) {
+    if (tokenType() != 'symbol') {
       throw Exception("currentToken is not a symbol");
     }
 
@@ -274,7 +266,7 @@ class JackTokenizer {
   }
 
   String identifier() {
-    if (tokenType() != TokenType.identifier) {
+    if (tokenType() != 'identifier') {
       throw Exception("currentToken is not an identifier");
     }
 
@@ -282,15 +274,15 @@ class JackTokenizer {
   }
 
   int intVal() {
-    if (tokenType() != TokenType.intConstant) {
-      throw Exception("currentToken is not an intConstant");
+    if (tokenType() != 'integerConstant') {
+      throw Exception("currentToken is not an integerConstant");
     }
 
     return int.parse(currentToken!);
   }
 
   String stringVal() {
-    if (tokenType() != TokenType.stringConstant) {
+    if (tokenType() != 'stringConstant') {
       throw Exception("currentToken is not a stringConstant");
     }
 

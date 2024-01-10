@@ -95,7 +95,7 @@ Four special symbols are escaped in XML:
 - `"` -> `&quot;`
 - `&` -> `&amp;`
 
-### API
+### Tokenizer API
 
 - `constructor`: Takes string as input and initializes the tokenizer.
 - `hasMoreTokens`: Returns true if there are more tokens available.
@@ -106,3 +106,27 @@ Four special symbols are escaped in XML:
 - `identifier`: Returns the identifier which is the current token. Should be called only if `tokenType` is `IDENTIFIER`.
 - `intVal`: Returns the integer value of the current token. Should be called only if `tokenType` is `INT_CONST`.
 - `stringVal`: Returns the string value of the current token, without the double quotes. Should be called only if `tokenType` is `STRING_CONST`.
+
+## Compilation Engine
+
+Parse the input file and generate the structured representation of the input source code wrapped in XML tags.
+
+Expressions and array-oriented commands are ignored.
+
+### Compilation Engine API
+
+- `constructor`: Takes string as input and initializes the compilation engine.
+- `compileClass`: Compiles a complete class.
+- `compileClassVarDec`: Compiles a static declaration or a field declaration.
+- `compileSubroutine`: Compiles a complete method, function, or constructor.
+- `compileParameterList`: Compiles a (possibly empty) parameter list, not including the enclosing “()”.
+- `compileVarDec`: Compiles a var declaration.
+- `compileStatements`: Compiles a sequence of statements, not including the enclosing “{}”.
+- `compileLet`: Compiles a let statement.
+- `compileIf`: Compiles an if statement, possibly with a trailing else clause.
+- `compileWhile`: Compiles a while statement.
+- `compileDo`: Compiles a do statement.
+- `compileReturn`: Compiles a return statement.
+- `compileExpression`: Compiles an expression.
+- `compileTerm`: Compiles a term. If the current token is an identifier, the routine must distinguish between a variable, an array entry, and a subroutine call.
+- `compileExpressionList`: Compiles a (possibly empty) comma-separated list of expressions.

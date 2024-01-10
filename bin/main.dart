@@ -11,5 +11,5 @@ void main(List<String> arguments) {
 
   var analyzer = JackAnalyzer(path);
 
-  analyzer.generateTokenizedOutput();
+  analyzer.compileXML();
 }

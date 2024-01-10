@@ -322,35 +322,35 @@ void main() {
       var scriptContent = 'class';
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.advance();
-      expect(tokenizer.tokenType(), equals(TokenType.keyword));
+      expect(tokenizer.tokenType(), equals('keyword'));
     });
 
     test('symbol', () {
       var scriptContent = '{';
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.advance();
-      expect(tokenizer.tokenType(), equals(TokenType.symbol));
+      expect(tokenizer.tokenType(), equals('symbol'));
     });
 
     test('stringConstant', () {
       var scriptContent = '"ha"';
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.advance();
-      expect(tokenizer.tokenType(), equals(TokenType.stringConstant));
+      expect(tokenizer.tokenType(), equals('stringConstant'));
     });
 
     test('identifier', () {
       var scriptContent = 'x';
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.advance();
-      expect(tokenizer.tokenType(), equals(TokenType.identifier));
+      expect(tokenizer.tokenType(), equals('identifier'));
     });
 
-    test('intConstant', () {
+    test('integerConstant', () {
       var scriptContent = '5';
       var tokenizer = JackTokenizer(scriptContent);
       tokenizer.advance();
-      expect(tokenizer.tokenType(), equals(TokenType.intConstant));
+      expect(tokenizer.tokenType(), equals('integerConstant'));
     });
   });
 
