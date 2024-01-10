@@ -11,14 +11,29 @@ class CompileEngine {
     process('class');
     process(tokenizer.currentToken!);
     process('{');
-    compileClassVarDec();
+
+    while (tokenizer.currentToken == 'static' ||
+        tokenizer.currentToken == 'field') {
+      compileClassVarDec();
+    }
+
     parseTree += '</class>\n';
     return parseTree;
   }
 
-  // todo: implement
   void compileClassVarDec() {
     parseTree += '<classVarDec>\n';
+
+    process(tokenizer.currentToken!); // static | field
+    process(tokenizer.currentToken!); // type
+
+    while (tokenizer.currentToken != ';') {
+      process(tokenizer.currentToken!); // varName
+      if (tokenizer.currentToken == ',') {
+        process(',');
+      }
+    }
+    process(";");
 
     parseTree += '</classVarDec>\n';
   }
