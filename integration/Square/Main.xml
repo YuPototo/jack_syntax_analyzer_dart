@@ -6,5 +6,10 @@
 <keyword> static </keyword>
 <keyword> boolean </keyword>
 <identifier> test </identifier>
+<symbol> ; </symbol>
 </classVarDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> main </identifier>
+<symbol> ( </symbol>
 </class>

@@ -17,6 +17,14 @@ class CompileEngine {
       compileClassVarDec();
     }
 
+    while (tokenizer.currentToken == 'constructor' ||
+        tokenizer.currentToken == 'function' ||
+        tokenizer.currentToken == 'method') {
+      compileSubroutine();
+    }
+
+    //  process('}');
+
     parseTree += '</class>\n';
     return parseTree;
   }
@@ -36,6 +44,38 @@ class CompileEngine {
     process(";");
 
     parseTree += '</classVarDec>\n';
+  }
+
+  void compileSubroutine() {
+    process(tokenizer.currentToken!); // constructor | function | method
+    process(tokenizer.currentToken!); // void | type
+    process(tokenizer.currentToken!); // subroutineName
+    process('(');
+    compileParameterList();
+    process(')');
+    compileSubroutineBody();
+  }
+
+  // handle in next project
+  void compileParameterList() {
+    parseTree += '<parameterList>\n';
+    parseTree += '</parameterList>\n';
+  }
+
+  void compileSubroutineBody() {
+    parseTree += '<subroutineBody>\n';
+    process('{');
+
+    while (tokenizer.currentToken == 'var') {
+      // todo: here
+      // compileVarDec();
+    }
+
+    // todo: here
+    // compileStatements();
+
+    process('}');
+    parseTree += '</subroutineBody>\n';
   }
 
   /// Compiles a terminal. If the current token is an identifier, the routine must distinguish between a variable, an array entry, and a subroutine call.
