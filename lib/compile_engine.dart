@@ -9,8 +9,23 @@ class CompileEngine {
   String compileClass() {
     parseTree += '<class>\n';
     process('class');
+    process(tokenizer.currentToken!);
+    process('{');
+    compileClassVarDec();
     parseTree += '</class>\n';
     return parseTree;
+  }
+
+  // todo: implement
+  void compileClassVarDec() {
+    parseTree += '<classVarDec>\n';
+
+    parseTree += '</classVarDec>\n';
+  }
+
+  /// Compiles a terminal. If the current token is an identifier, the routine must distinguish between a variable, an array entry, and a subroutine call.
+  void compileTerm() {
+    // todo
   }
 
   void process(String token) {
