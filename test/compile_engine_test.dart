@@ -255,22 +255,46 @@ class Main {
   // todo
   group('compileStatements', () {});
 
+  // todo
   group('compileLet', () {
-    test('Let x = 1;', () {
+    test('let x = 1;', () {
       var tokenizer = JackTokenizer('let x = 1;');
       var compileEngine = CompileEngine(tokenizer);
       tokenizer.advance();
       compileEngine.compileStatements();
       var expected = '''
-<statements>
 <letStatement>
-<keyword> let </keyword>
-<identifier> x </identifier>
-<symbol> = </symbol>
-<integerConstant> 1 </integerConstant>
-<symbol> ; </symbol>
+  <keyword> let </keyword>
+  <identifier> x </identifier>
+  <symbol> = </symbol>
+  <expression>
+    <term>
+      <integerConstant> 1 </integerConstant>
+    </term>
+  </expression>
+  <symbol> ; </symbol>
 </letStatement>
-</statements>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('let x = y;', () {
+      var tokenizer = JackTokenizer('let x = y;');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileStatements();
+      var expected = '''
+<letStatement>
+  <keyword> let </keyword>
+  <identifier> x </identifier>
+  <symbol> = </symbol>
+  <expression>
+      <term>
+          <identifier> Ax </identifier>
+      </term>
+  </expression>
+  <symbol> ; </symbol>
+</letStatement>
 ''';
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
     });
