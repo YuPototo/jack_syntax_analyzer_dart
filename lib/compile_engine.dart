@@ -7,6 +7,7 @@ class CompileEngine {
   CompileEngine(this.tokenizer);
 
   String compileClass() {
+    tokenizer.advance();
     parseTree += '<class>\n';
     process('class');
     process(tokenizer.currentToken!);
@@ -23,7 +24,7 @@ class CompileEngine {
       compileSubroutine();
     }
 
-    //  process('}');
+    process('}');
 
     parseTree += '</class>\n';
     return parseTree;
@@ -56,9 +57,16 @@ class CompileEngine {
     compileSubroutineBody();
   }
 
-  // handle in next project
   void compileParameterList() {
     parseTree += '<parameterList>\n';
+
+    while (tokenizer.currentToken != ')') {
+      process(tokenizer.currentToken!); // type
+      process(tokenizer.currentToken!); // varName
+      if (tokenizer.currentToken == ',') {
+        process(',');
+      }
+    }
     parseTree += '</parameterList>\n';
   }
 
@@ -68,7 +76,7 @@ class CompileEngine {
 
     while (tokenizer.currentToken == 'var') {
       // todo: here
-      // compileVarDec();
+      compileVarDec();
     }
 
     // todo: here
@@ -82,6 +90,38 @@ class CompileEngine {
   void compileTerm() {
     // todo
   }
+
+  void compileVarDec() {
+    parseTree += '<varDec>\n';
+    process('var');
+    process(tokenizer.currentToken!); // type
+
+    while (tokenizer.currentToken != ';') {
+      process(tokenizer.currentToken!); // varName
+      if (tokenizer.currentToken == ',') {
+        process(',');
+      }
+    }
+    process(';');
+    parseTree += '</varDec>\n';
+  }
+
+  void compileStatements() {}
+
+  void compileLet() {
+    parseTree += '<letStatement>\n';
+    process('let');
+    process(tokenizer.currentToken!); // varName
+
+    process('=');
+
+    compileExpression();
+
+    process(';');
+    parseTree += '</letStatement>\n';
+  }
+
+  void compileExpression() {}
 
   void process(String token) {
     if (tokenizer.currentToken == token) {

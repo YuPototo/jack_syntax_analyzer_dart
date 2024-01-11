@@ -69,8 +69,6 @@ class JackAnalyzer {
 
       JackTokenizer tokenizer = JackTokenizer(scriptContent);
 
-      tokenizer.advance(); // first token should be `class`
-
       CompileEngine compileEngine = CompileEngine(tokenizer);
 
       String parseTree = compileEngine.compileClass();
