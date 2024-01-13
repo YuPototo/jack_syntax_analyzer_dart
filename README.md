@@ -2,6 +2,7 @@
 
 Nand2Tetris project 10: Jack Syntax Analyzer.
 
+
 ## Usage
 
 ```bash
@@ -130,3 +131,45 @@ Expressions and array-oriented commands are ignored.
 - `compileExpression`: Compiles an expression.
 - `compileTerm`: Compiles a term. If the current token is an identifier, the routine must distinguish between a variable, an array entry, and a subroutine call.
 - `compileExpressionList`: Compiles a (possibly empty) comma-separated list of expressions.
+
+### Tasks
+
+1. Expressions and array-oriented commands are ignored.
+2. Handle expressions.
+3. Handle array-oriented commands.
+
+#### Statements
+
+Statements:
+
+- [ ] *statements**
+
+Statement:
+
+- [x] *letStatement*
+- [ ] *ifStatement*
+- [ ] *whileStatement*
+- [ ] *doStatement*
+- [ ] *returnStatement*
+
+#### Expressions
+
+Expression:
+
+- [ ] *term*
+- [ ] *term (op term)**
+
+Term:
+
+- [x] *integerConstant*
+- [x] *stringConstant*
+- [x] *keywordConstant*
+- [x] *varName*
+- [ ] *varName* '[' *expression* ']'
+- [x] '(' *expression* ')'
+- [x] (*unaryOp* *term*)
+- [ ] *subroutineCall*
+
+SubroutineCall: later
+
+ExpressionList

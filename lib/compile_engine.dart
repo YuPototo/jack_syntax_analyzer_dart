@@ -88,7 +88,22 @@ class CompileEngine {
 
   /// Compiles a terminal. If the current token is an identifier, the routine must distinguish between a variable, an array entry, and a subroutine call.
   void compileTerm() {
-    // todo
+    parseTree += '<term>\n';
+
+    if (tokenizer.tokenType() == 'integerConstant' ||
+        tokenizer.tokenType() == 'stringConstant' ||
+        tokenizer.tokenType() == 'identifier' ||
+        tokenizer.tokenType() == 'keyword') {
+      process(tokenizer.currentToken!);
+    } else if (tokenizer.currentToken == '(') {
+      process('(');
+      compileExpression();
+      process(')');
+    } else if (tokenizer.currentToken == '-' || tokenizer.currentToken == '~') {
+      process(tokenizer.currentToken!);
+      compileTerm();
+    }
+    parseTree += '</term>\n';
   }
 
   void compileVarDec() {
@@ -106,7 +121,29 @@ class CompileEngine {
     parseTree += '</varDec>\n';
   }
 
-  void compileStatements() {}
+  void compileStatements() {
+    parseTree += '<statements>\n';
+    while (tokenizer.currentToken == 'let' ||
+        tokenizer.currentToken == 'if' ||
+        tokenizer.currentToken == 'while' ||
+        tokenizer.currentToken == 'do' ||
+        tokenizer.currentToken == 'return') {
+      if (tokenizer.currentToken == 'let') {
+        compileLet();
+      }
+
+      // else if (tokenizer.currentToken == 'if') {
+      //   compileIf();
+      // } else if (tokenizer.currentToken == 'while') {
+      //   compileWhile();
+      // } else if (tokenizer.currentToken == 'do') {
+      //   compileDo();
+      // } else if (tokenizer.currentToken == 'return') {
+      //   compileReturn();
+      // }
+    }
+    parseTree += '</statements>\n';
+  }
 
   void compileLet() {
     parseTree += '<letStatement>\n';
@@ -121,12 +158,35 @@ class CompileEngine {
     parseTree += '</letStatement>\n';
   }
 
-  void compileExpression() {}
+  void compileExpression() {
+    parseTree += '<expression>\n';
+    compileTerm();
+    while (tokenizer.currentToken == '+' ||
+        tokenizer.currentToken == '-' ||
+        tokenizer.currentToken == '*' ||
+        tokenizer.currentToken == '/' ||
+        tokenizer.currentToken == '&' ||
+        tokenizer.currentToken == '|' ||
+        tokenizer.currentToken == '<' ||
+        tokenizer.currentToken == '>' ||
+        tokenizer.currentToken == '=') {
+      process(tokenizer.currentToken!);
+      compileTerm();
+    }
+    parseTree += '</expression>\n';
+  }
 
   void process(String token) {
     if (tokenizer.currentToken == token) {
       String tokenType = tokenizer.tokenType();
-      parseTree += '<$tokenType> ${tokenizer.currentToken} </$tokenType>\n';
+      if (tokenType == 'stringConstant') {
+        int endIndex = tokenizer.currentToken!.length - 1;
+        String tokenWithoutQuotes =
+            tokenizer.currentToken!.substring(1, endIndex);
+        parseTree += '<$tokenType> $tokenWithoutQuotes </$tokenType>\n';
+      } else {
+        parseTree += '<$tokenType> ${tokenizer.currentToken} </$tokenType>\n';
+      }
       tokenizer.advance();
     } else {
       throw Exception('Expected $token but got ${tokenizer.currentToken}');

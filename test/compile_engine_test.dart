@@ -8,9 +8,7 @@ import 'package:test/test.dart';
  *  - compile subroutine
  *   -   compile subroutine body
  *     -   compile statements
- *        - let
- *           - compileExpression
- *        - if
+ *        - if: now
  *        - while
  *        - do
  *        - return
@@ -255,13 +253,12 @@ class Main {
   // todo
   group('compileStatements', () {});
 
-  // todo
   group('compileLet', () {
     test('let x = 1;', () {
       var tokenizer = JackTokenizer('let x = 1;');
       var compileEngine = CompileEngine(tokenizer);
       tokenizer.advance();
-      compileEngine.compileStatements();
+      compileEngine.compileLet();
       var expected = '''
 <letStatement>
   <keyword> let </keyword>
@@ -301,15 +298,129 @@ class Main {
   }, skip: true);
 
   group('compileExpression', () {
-    test('x > 1', () {
-      var tokenizer = JackTokenizer('x > 1');
+    test('1', () {
+      // let x = 1;
+      var tokenizer = JackTokenizer('1');
       var compileEngine = CompileEngine(tokenizer);
       tokenizer.advance();
       compileEngine.compileExpression();
       var expected = '''
-???
+<expression>
+    <term>
+        <integerConstant> 1 </integerConstant>
+    </term>
+</expression>
 ''';
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
-    }, skip: true);
+    });
+
+    test('x', () {
+      // let y = x;
+      var tokenizer = JackTokenizer('x');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileExpression();
+      var expected = '''
+<expression>
+    <term>
+        <identifier> x </identifier>
+    </term>
+</expression>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+  });
+
+  group('compileTerm', () {
+    test('integerConstant', () {
+      var tokenizer = JackTokenizer('1');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileTerm();
+      var expected = '''
+    <term>
+        <integerConstant> 1 </integerConstant>
+    </term>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('stringConstant', () {
+      var tokenizer = JackTokenizer('"string"');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileTerm();
+      var expected = '''
+    <term>
+        <stringConstant> string </stringConstant>
+    </term>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('keyword constant', () {
+      var tokenizer = JackTokenizer('true');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileTerm();
+      var expected = '''
+    <term>
+        <keyword> true </keyword> 
+    </term>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('varName', () {
+      var tokenizer = JackTokenizer('x');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileTerm();
+      var expected = '''
+    <term>
+        <identifier> x </identifier> 
+    </term>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('(expression)', () {
+      var tokenizer = JackTokenizer('(x)');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileTerm();
+      var expected = '''
+    <term>
+        <symbol> ( </symbol>
+        <expression>
+            <term>
+                <identifier> x </identifier> 
+            </term>
+        </expression>
+        <symbol> ) </symbol>
+    </term>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('unaryOp term', () {
+      var tokenizer = JackTokenizer('-x');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileTerm();
+      var expected = '''
+    <term>
+        <symbol> - </symbol>
+        <term>
+            <identifier> x </identifier> 
+        </term>
+    </term>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('subroutineCall', () {}, skip: true);
+
+    test('varName[expression]', () {}, skip: true);
   });
 }
