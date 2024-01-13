@@ -2,7 +2,6 @@
 
 Nand2Tetris project 10: Jack Syntax Analyzer.
 
-
 ## Usage
 
 ```bash
@@ -120,7 +119,7 @@ Expressions and array-oriented commands are ignored.
 - `compileClass`: Compiles a complete class.
 - `compileClassVarDec`: Compiles a static declaration or a field declaration.
 - `compileSubroutine`: Compiles a complete method, function, or constructor.
-- `compileParameterList`: Compiles a (possibly empty) parameter list, not including the enclosing “()”. 
+- `compileParameterList`: Compiles a (possibly empty) parameter list, not including the enclosing “()”.
 - `compileVarDec`: Compiles a var declaration.
 - `compileStatements`: Compiles a sequence of statements, not including the enclosing “{}”.
 - `compileLet`: Compiles a let statement.

@@ -130,10 +130,9 @@ class CompileEngine {
         tokenizer.currentToken == 'return') {
       if (tokenizer.currentToken == 'let') {
         compileLet();
+      } else if (tokenizer.currentToken == 'if') {
+        compileIf();
       }
-
-      // else if (tokenizer.currentToken == 'if') {
-      //   compileIf();
       // } else if (tokenizer.currentToken == 'while') {
       //   compileWhile();
       // } else if (tokenizer.currentToken == 'do') {
@@ -156,6 +155,36 @@ class CompileEngine {
 
     process(';');
     parseTree += '</letStatement>\n';
+  }
+
+  void compileIf() {
+    parseTree += '<ifStatement>\n';
+    process('if');
+    process('(');
+    compileExpression();
+    process(')');
+    process('{');
+    compileStatements();
+    process('}');
+    if (tokenizer.currentToken == 'else') {
+      process('else');
+      process('{');
+      compileStatements();
+      process('}');
+    }
+    parseTree += '</ifStatement>\n';
+  }
+
+  void compileWhile() {
+    parseTree += '<whileStatement>\n';
+    process('while');
+    process('(');
+    compileExpression();
+    process(')');
+    process('{');
+    compileStatements();
+    process('}');
+    parseTree += '</whileStatement>\n';
   }
 
   void compileExpression() {

@@ -2,17 +2,13 @@ import 'package:jack_syntax_analyzer_dart/compile_engine.dart';
 import 'package:jack_syntax_analyzer_dart/jack_tokenizer.dart';
 import 'package:test/test.dart';
 
-/**
- * 
- * Complile class
- *  - compile subroutine
- *   -   compile subroutine body
- *     -   compile statements
- *        - if: now
- *        - while
- *        - do
- *        - return
- */
+///
+/// Compile class
+///  - compile subroutine
+///   -   compile subroutine body
+///     -   compile statements
+///        - do: todo
+///        - return
 
 void main() {
   group('compileClass()', () {
@@ -281,21 +277,104 @@ class Main {
       tokenizer.advance();
       compileEngine.compileStatements();
       var expected = '''
+<statements>
 <letStatement>
   <keyword> let </keyword>
   <identifier> x </identifier>
   <symbol> = </symbol>
   <expression>
       <term>
-          <identifier> Ax </identifier>
+          <identifier> y </identifier>
       </term>
   </expression>
   <symbol> ; </symbol>
 </letStatement>
+</statements>
 ''';
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
     });
-  }, skip: true);
+  });
+
+  group('compileIf', () {
+    test('if (x) {}', () {
+      var tokenizer = JackTokenizer('if (x) {}');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileIf();
+      var expected = '''
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+    <term>
+        <identifier> x </identifier>
+    </term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+    ''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('if (x) { } else {}', () {
+      var tokenizer = JackTokenizer('if (x) { } else {}');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileIf();
+      var expected = '''
+<ifStatement>
+  <keyword> if </keyword>
+  <symbol> ( </symbol>
+  <expression>
+      <term>
+          <identifier> x </identifier>
+      </term>
+  </expression>
+  <symbol> ) </symbol>
+  <symbol> { </symbol>
+  <statements>
+  </statements>
+  <symbol> } </symbol>
+  <keyword> else </keyword>
+  <symbol> { </symbol>
+  <statements>
+  </statements>
+  <symbol> } </symbol>
+  </ifStatement>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+  });
+
+  group('compileWhile', () {
+    test('while (x) {}', () {
+      var tokenizer = JackTokenizer('while (x) {}');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileWhile();
+      var expected = '''
+<whileStatement>
+<keyword> while </keyword>
+<symbol> ( </symbol>
+<expression>
+    <term>
+        <identifier> x </identifier>
+    </term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+</statements>
+<symbol> } </symbol>
+</whileStatement>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+  });
 
   group('compileExpression', () {
     test('1', () {
