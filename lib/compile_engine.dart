@@ -48,6 +48,7 @@ class CompileEngine {
   }
 
   void compileSubroutine() {
+    parseTree += '<subroutineDec>\n';
     process(tokenizer.currentToken!); // constructor | function | method
     process(tokenizer.currentToken!); // void | type
     process(tokenizer.currentToken!); // subroutineName
@@ -55,6 +56,7 @@ class CompileEngine {
     compileParameterList();
     process(')');
     compileSubroutineBody();
+    parseTree += '</subroutineDec>\n';
   }
 
   void compileParameterList() {
@@ -203,6 +205,42 @@ class CompileEngine {
       compileTerm();
     }
     parseTree += '</expression>\n';
+  }
+
+  void compileDo() {
+    parseTree += '<doStatement>\n';
+    process('do');
+    process(tokenizer.currentToken!); // subroutineName | className | varName
+    if (tokenizer.currentToken == '.') {
+      process('.');
+      process(tokenizer.currentToken!); // subroutineName
+    }
+    process('(');
+    compileExpressionList();
+    process(')');
+    process(';');
+    parseTree += '</doStatement>\n';
+  }
+
+  void compileExpressionList() {
+    parseTree += '<expressionList>\n';
+    while (tokenizer.currentToken != ')') {
+      compileExpression();
+      if (tokenizer.currentToken == ',') {
+        process(',');
+      }
+    }
+    parseTree += '</expressionList>\n';
+  }
+
+  void compileReturn() {
+    parseTree += '<returnStatement>\n';
+    process('return');
+    if (tokenizer.currentToken != ';') {
+      compileExpression();
+    }
+    process(';');
+    parseTree += '</returnStatement>\n';
   }
 
   void process(String token) {

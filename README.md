@@ -141,15 +141,15 @@ Expressions and array-oriented commands are ignored.
 
 Statements:
 
-- [ ] *statements**
+- [x] *statements**
 
 Statement:
 
 - [x] *letStatement*
-- [ ] *ifStatement*
-- [ ] *whileStatement*
-- [ ] *doStatement*
-- [ ] *returnStatement*
+- [x] *ifStatement*
+- [x] *whileStatement*
+- [x] *doStatement*
+- [x] *returnStatement*
 
 #### Expressions
 
@@ -167,7 +167,7 @@ Term:
 - [ ] *varName* '[' *expression* ']'
 - [x] '(' *expression* ')'
 - [x] (*unaryOp* *term*)
-- [ ] *subroutineCall*
+
 
 SubroutineCall: later
 

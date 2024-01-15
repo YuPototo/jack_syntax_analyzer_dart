@@ -2,14 +2,6 @@ import 'package:jack_syntax_analyzer_dart/compile_engine.dart';
 import 'package:jack_syntax_analyzer_dart/jack_tokenizer.dart';
 import 'package:test/test.dart';
 
-///
-/// Compile class
-///  - compile subroutine
-///   -   compile subroutine body
-///     -   compile statements
-///        - do: todo
-///        - return
-
 void main() {
   group('compileClass()', () {
     test('A simple class', () {
@@ -153,8 +145,30 @@ class Main {
     });
   });
 
-  // todo
-  group('compileSubroutine', () {});
+  group('compileSubroutine', () {
+    test('a simple constructor', () {
+      var tokenizer = JackTokenizer('function void main() {}');
+      tokenizer.advance();
+      var compileEngine = CompileEngine(tokenizer);
+      compileEngine.compileSubroutine();
+      var expected = '''
+<subroutineDec>
+  <keyword> function </keyword>
+    <keyword> void </keyword>
+    <identifier> main </identifier>
+    <symbol> ( </symbol>
+    <parameterList>
+    </parameterList>
+    <symbol> ) </symbol>
+    <subroutineBody>
+      <symbol> { </symbol>
+      <symbol> } </symbol>
+    </subroutineBody>
+</subroutineDec>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+  });
 
   group('compileParameterList', () {
     test('empty parameter list', () {
@@ -207,8 +221,24 @@ class Main {
     });
   });
 
-  // todo
-  group('compileSubroutineBody', () {});
+  group('compileSubroutineBody', () {
+    test('empty body', () {
+      var tokenizer = JackTokenizer('{}');
+      var compileEngine = CompileEngine(tokenizer);
+
+      tokenizer.advance();
+
+      compileEngine.compileSubroutineBody();
+
+      var expected = '''
+<subroutineBody>
+<symbol> { </symbol>
+<symbol> } </symbol>
+</subroutineBody>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+  });
 
   group('compileVarDec()', () {
     test('a var', () {
@@ -247,7 +277,79 @@ class Main {
   });
 
   // todo
-  group('compileStatements', () {});
+  group('compileStatements', () {
+    test('empty statement', () {
+      var tokenizer = JackTokenizer('{}');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      tokenizer.advance(); // pass {
+      compileEngine.compileStatements();
+      var expected = '''
+<statements>
+</statements>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('letStatement', () {
+      var tokenizer = JackTokenizer('{ let x = 1; }');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      tokenizer.advance(); // pass {
+      compileEngine.compileStatements();
+      var expected = '''
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> x </identifier>
+<symbol> = </symbol>
+<expression>
+    <term>
+        <integerConstant> 1 </integerConstant>
+    </term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+</statements>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('two letStatement', () {
+      var tokenizer = JackTokenizer('{ let x = 1; let y = 2; }');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      tokenizer.advance(); // pass {
+      compileEngine.compileStatements();
+      var expected = '''
+<statements>
+  <letStatement>
+    <keyword> let </keyword>
+    <identifier> x </identifier>
+    <symbol> = </symbol>
+    <expression>
+        <term>
+            <integerConstant> 1 </integerConstant>
+        </term>
+    </expression>
+    <symbol> ; </symbol>
+  </letStatement>
+  <letStatement>
+    <keyword> let </keyword>
+    <identifier> y </identifier>
+    <symbol> = </symbol>
+    <expression>
+        <term>
+            <integerConstant> 2 </integerConstant>
+        </term>
+    </expression>
+    <symbol> ; </symbol>
+  </letStatement>
+</statements>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+  });
 
   group('compileLet', () {
     test('let x = 1;', () {
@@ -498,8 +600,64 @@ class Main {
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
     });
 
-    test('subroutineCall', () {}, skip: true);
-
     test('varName[expression]', () {}, skip: true);
+  });
+
+  group('compileDo', () {
+    test('do moveSquare();', () {
+      var tokenizer = JackTokenizer('do moveSquare();');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileDo();
+      var expected = '''
+<doStatement>
+<keyword> do </keyword>
+<identifier> moveSquare </identifier>
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('do square.dispose();', () {
+      var tokenizer = JackTokenizer('do square.dispose();');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileDo();
+      var expected = '''
+<doStatement>
+<keyword> do </keyword>
+<identifier> square </identifier>
+<symbol> . </symbol>
+<identifier> dispose </identifier>
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+  });
+
+  group('compileReturn', () {
+    test('return;', () {
+      var tokenizer = JackTokenizer('return;');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileReturn();
+      var expected = '''
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
   });
 }
