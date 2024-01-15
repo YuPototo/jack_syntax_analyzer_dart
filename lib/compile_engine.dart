@@ -77,12 +77,10 @@ class CompileEngine {
     process('{');
 
     while (tokenizer.currentToken == 'var') {
-      // todo: here
       compileVarDec();
     }
 
-    // todo: here
-    // compileStatements();
+    compileStatements();
 
     process('}');
     parseTree += '</subroutineBody>\n';
@@ -134,14 +132,13 @@ class CompileEngine {
         compileLet();
       } else if (tokenizer.currentToken == 'if') {
         compileIf();
+      } else if (tokenizer.currentToken == 'while') {
+        compileWhile();
+      } else if (tokenizer.currentToken == 'do') {
+        compileDo();
+      } else if (tokenizer.currentToken == 'return') {
+        compileReturn();
       }
-      // } else if (tokenizer.currentToken == 'while') {
-      //   compileWhile();
-      // } else if (tokenizer.currentToken == 'do') {
-      //   compileDo();
-      // } else if (tokenizer.currentToken == 'return') {
-      //   compileReturn();
-      // }
     }
     parseTree += '</statements>\n';
   }

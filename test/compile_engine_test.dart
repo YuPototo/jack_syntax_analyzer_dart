@@ -162,6 +162,76 @@ class Main {
     <symbol> ) </symbol>
     <subroutineBody>
       <symbol> { </symbol>
+        <statements>
+        </statements>
+      <symbol> } </symbol>
+    </subroutineBody>
+</subroutineDec>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('with varDec', () {
+      var tokenizer = JackTokenizer('''
+    function void main() {
+        var SquareGame game;
+    }
+''');
+      tokenizer.advance();
+      var compileEngine = CompileEngine(tokenizer);
+      compileEngine.compileSubroutine();
+      var expected = '''
+<subroutineDec>
+  <keyword> function </keyword>
+    <keyword> void </keyword>
+    <identifier> main </identifier>
+    <symbol> ( </symbol>
+      <parameterList>
+      </parameterList>
+    <symbol> ) </symbol>
+    <subroutineBody>
+      <symbol> { </symbol>
+        <varDec>
+          <keyword> var </keyword>
+          <identifier> SquareGame </identifier>
+          <identifier> game </identifier>
+          <symbol> ; </symbol>
+        </varDec>
+        <statements>
+        </statements>
+      <symbol> } </symbol>
+    </subroutineBody>
+</subroutineDec>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('with statements', () {
+      var tokenizer = JackTokenizer('''
+    function void main() {
+        return;
+    }
+''');
+      tokenizer.advance();
+      var compileEngine = CompileEngine(tokenizer);
+      compileEngine.compileSubroutine();
+      var expected = '''
+<subroutineDec>
+  <keyword> function </keyword>
+    <keyword> void </keyword>
+    <identifier> main </identifier>
+    <symbol> ( </symbol>
+      <parameterList>
+      </parameterList>
+    <symbol> ) </symbol>
+    <subroutineBody>
+      <symbol> { </symbol>
+        <statements>
+          <returnStatement>
+            <keyword> return </keyword>
+            <symbol> ; </symbol>
+          </returnStatement>
+        </statements>
       <symbol> } </symbol>
     </subroutineBody>
 </subroutineDec>
@@ -233,6 +303,8 @@ class Main {
       var expected = '''
 <subroutineBody>
 <symbol> { </symbol>
+    <statements>
+    </statements>
 <symbol> } </symbol>
 </subroutineBody>
 ''';
