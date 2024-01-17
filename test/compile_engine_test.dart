@@ -348,7 +348,6 @@ class Main {
     });
   });
 
-  // todo
   group('compileStatements', () {
     test('empty statement', () {
       var tokenizer = JackTokenizer('{}');
@@ -449,9 +448,8 @@ class Main {
       var tokenizer = JackTokenizer('let x = y;');
       var compileEngine = CompileEngine(tokenizer);
       tokenizer.advance();
-      compileEngine.compileStatements();
+      compileEngine.compileLet();
       var expected = '''
-<statements>
 <letStatement>
   <keyword> let </keyword>
   <identifier> x </identifier>
@@ -463,7 +461,68 @@ class Main {
   </expression>
   <symbol> ; </symbol>
 </letStatement>
-</statements>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('let game = SquareGame.new();', () {
+      var tokenizer = JackTokenizer('let game = SquareGame.new();');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileLet();
+      var expected = '''
+<letStatement>
+  <keyword> let </keyword>
+  <identifier> game </identifier>
+  <symbol> = </symbol>
+  <expression>
+    <term>
+      <identifier> SquareGame </identifier>
+      <symbol> . </symbol>
+      <identifier> new </identifier>
+      <symbol> ( </symbol>
+      <expressionList>
+      </expressionList>
+      <symbol> ) </symbol>
+    </term>
+  </expression>
+  <symbol> ; </symbol>
+</letStatement>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('let a[1] = a[2]', () {
+      var tokenizer = JackTokenizer('let a[1] = a[2];');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileLet();
+      var expected = '''
+<letStatement>
+  <keyword> let </keyword>
+  <identifier> a </identifier>
+  <symbol> [ </symbol>
+  <expression>
+    <term>
+      <integerConstant> 1 </integerConstant>
+    </term>
+  </expression>
+  <symbol> ] </symbol>
+  <symbol> = </symbol>
+  <expression>
+      <term>
+        <identifier> a </identifier>
+        <symbol> [ </symbol>
+        <expression>
+          <term>
+            <integerConstant> 2 </integerConstant>
+          </term>
+        </expression>
+        <symbol> ] </symbol>
+      </term>
+  </expression>
+  <symbol> ; </symbol>
+</letStatement>
 ''';
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
     });
@@ -518,7 +577,7 @@ class Main {
   <statements>
   </statements>
   <symbol> } </symbol>
-  </ifStatement>
+</ifStatement>
 ''';
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
     });
@@ -578,6 +637,77 @@ class Main {
     <term>
         <identifier> x </identifier>
     </term>
+</expression>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('SquareGame.new()', () {
+      // let game = SquareGame.new();
+      var tokenizer = JackTokenizer('SquareGame.new()');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileExpression();
+      var expected = '''
+<expression>
+  <term>
+      <identifier> SquareGame </identifier>
+      <symbol> . </symbol>
+      <identifier> new </identifier>
+      <symbol> ( </symbol>
+      <expressionList>
+      </expressionList>
+      <symbol> ) </symbol>
+    </term> 
+</expression>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test('x < 254', () {
+      var tokenizer = JackTokenizer('x < 254');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileExpression();
+      var expected = '''
+<expression>
+    <term>
+        <identifier> x </identifier>
+    </term>
+    <symbol> &lt; </symbol>
+    <term>
+        <integerConstant> 254 </integerConstant>
+    </term>
+</expression>
+''';
+      expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
+    });
+
+    test(' (x + size) > 510', () {
+      // if ((x + size) > 510) {}
+      var tokenizer = JackTokenizer('(x + size) > 510');
+      var compileEngine = CompileEngine(tokenizer);
+      tokenizer.advance();
+      compileEngine.compileExpression();
+      var expected = '''
+<expression>
+  <term>
+    <symbol> ( </symbol>
+      <expression>
+        <term>
+          <identifier> x </identifier>
+        </term>
+        <symbol> + </symbol>
+        <term>
+          <identifier> size </identifier>
+        </term>
+      </expression>
+      <symbol> ) </symbol>
+  </term>
+  <symbol> &gt; </symbol>
+  <term>
+    <integerConstant> 510 </integerConstant>
+  </term>
 </expression>
 ''';
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));

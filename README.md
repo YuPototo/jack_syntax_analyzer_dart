@@ -168,13 +168,6 @@ Term:
 - [x] '(' *expression* ')'
 - [x] (*unaryOp* *term*)
 
-
 SubroutineCall: later
 
 ExpressionList
-
-
-<subroutineDec> <keyword> function </keyword> <keyword> void </keyword> <identifier> main </identifier> <symbol> ( </symbol> <parameterList> </parameterList> <symbol> ) </symbol> <symbol> { </symbol> <varDec> <keyword> var </keyword> <identifier> SquareGame </identifier> <identifier> game </identifier> <symbol> ; </symbol> </varDec> <symbol> } </symbol> </subroutineDec>
-
-
-<subroutineDec> <keyword> function </keyword> <keyword> void </keyword> <identifier> main </identifier> <symbol> ( </symbol> <parameterList> </parameterList> <symbol> ) </symbol> <subroutineBody> <symbol> { </symbol> <varDec> <keyword> var </keyword> <identifier> SquareGame </identifier> <identifier> game </identifier> <symbol> ; </symbol> </varDec> <symbol> } </symbol> </subroutineBody> </subroutineDec>

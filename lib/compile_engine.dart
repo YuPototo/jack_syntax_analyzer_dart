@@ -1,5 +1,7 @@
 import 'package:jack_syntax_analyzer_dart/jack_tokenizer.dart';
 
+const specialSymboList = ['<', '>', '&'];
+
 class CompileEngine {
   JackTokenizer tokenizer;
   String parseTree = '';
@@ -92,7 +94,6 @@ class CompileEngine {
 
     if (tokenizer.tokenType() == 'integerConstant' ||
         tokenizer.tokenType() == 'stringConstant' ||
-        tokenizer.tokenType() == 'identifier' ||
         tokenizer.tokenType() == 'keyword') {
       process(tokenizer.currentToken!);
     } else if (tokenizer.currentToken == '(') {
@@ -102,7 +103,25 @@ class CompileEngine {
     } else if (tokenizer.currentToken == '-' || tokenizer.currentToken == '~') {
       process(tokenizer.currentToken!);
       compileTerm();
+    } else if (tokenizer.tokenType() == 'identifier') {
+      process(tokenizer.currentToken!);
+      if (tokenizer.currentToken == '[') {
+        process('[');
+        compileExpression();
+        process(']');
+      } else if (tokenizer.currentToken == '(') {
+        process('(');
+        compileExpressionList();
+        process(')');
+      } else if (tokenizer.currentToken == '.') {
+        process('.');
+        process(tokenizer.currentToken!); // subroutineName
+        process('(');
+        compileExpressionList();
+        process(')');
+      }
     }
+
     parseTree += '</term>\n';
   }
 
@@ -147,6 +166,12 @@ class CompileEngine {
     parseTree += '<letStatement>\n';
     process('let');
     process(tokenizer.currentToken!); // varName
+
+    if (tokenizer.currentToken == '[') {
+      process('[');
+      compileExpression();
+      process(']');
+    }
 
     process('=');
 
@@ -249,7 +274,17 @@ class CompileEngine {
             tokenizer.currentToken!.substring(1, endIndex);
         parseTree += '<$tokenType> $tokenWithoutQuotes </$tokenType>\n';
       } else {
-        parseTree += '<$tokenType> ${tokenizer.currentToken} </$tokenType>\n';
+        if (tokenType == 'symbol' && specialSymboList.contains(token)) {
+          if (token == '&') {
+            parseTree += '<$tokenType> &amp; </$tokenType>\n';
+          } else if (token == '<') {
+            parseTree += '<$tokenType> &lt; </$tokenType>\n';
+          } else if (token == '>') {
+            parseTree += '<$tokenType> &gt; </$tokenType>\n';
+          }
+        } else {
+          parseTree += '<$tokenType> ${tokenizer.currentToken} </$tokenType>\n';
+        }
       }
       tokenizer.advance();
     } else {
