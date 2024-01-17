@@ -801,8 +801,6 @@ class Main {
 ''';
       expect(compileEngine.parseTree, equalsIgnoringWhitespace(expected));
     });
-
-    test('varName[expression]', () {}, skip: true);
   });
 
   group('compileDo', () {
